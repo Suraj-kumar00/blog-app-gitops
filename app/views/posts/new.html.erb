@@ -1,0 +1,11 @@
+<div class="mb-6">
+  <h1 class="text-3xl font-bold text-gray-800 mb-8">New Post</h1>
+
+  <%= render "form", post: @post %>
+
+  <div class="mt-6">
+    <%= link_to posts_path, class: "inline-flex items-center text-gray-600 hover:text-gray-900 transition" do %>
+      <i class="fas fa-arrow-left mr-2"></i> Back to posts
+    <% end %>
+  </div>
+</div>

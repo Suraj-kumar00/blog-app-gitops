@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Blog Posts</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <!-- Add Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Add custom icon font -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+    
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#3b82f6',
+              secondary: '#64748b',
+            }
+          }
+        }
+      }
+    </script>
+  </head>
+
+  <body class="bg-gray-50 min-h-screen">
+    <header class="bg-white shadow-sm">
+      <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+        <a href="<%= posts_path %>" class="text-2xl font-bold text-primary hover:text-blue-700 transition">BlogPosts</a>
+        <nav>
+          <%= link_to "New Post", new_post_path, class: "bg-primary hover:bg-blue-700 text-white py-2 px-4 rounded font-medium transition" %>
+        </nav>
+      </div>
+    </header>
+    
+    <main class="max-w-5xl mx-auto px-4 py-8">
+      <% if notice %>
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 flex items-center" role="alert">
+          <i class="fas fa-check-circle mr-2"></i>
+          <span><%= notice %></span>
+        </div>
+      <% end %>
+      
+      <%= yield %>
+    </main>
+    
+    <footer class="bg-white border-t mt-auto">
+      <div class="max-w-5xl mx-auto px-4 py-6 text-center text-gray-500">
+        <p>© <%= Date.today.year %> BlogPosts - A simple Rails app</p>
+      </div>
+    </footer>
+  </body>
+</html>
