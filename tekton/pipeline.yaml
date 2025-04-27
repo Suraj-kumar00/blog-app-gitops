@@ -1,0 +1,60 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: blog-app-pipeline
+  namespace: tekton-pipelines
+spec:
+  workspaces:
+  - name: shared-workspace
+  - name: docker-credentials
+  params:
+  - name: git-url
+    type: string
+    description: Git repository URL
+    default: https://github.com/yourusername/blog-app.git
+  - name: git-revision
+    type: string
+    description: Git revision to checkout
+    default: main
+  - name: image-name
+    type: string
+    description: Name of the image to build
+    default: dockerhub-username/blog-app
+  - name: image-tag
+    type: string
+    description: Tag for the image
+    default: latest
+  tasks:
+  - name: fetch-repository
+    taskRef:
+      name: git-clone
+      kind: ClusterTask
+    workspaces:
+    - name: output
+      workspace: shared-workspace
+    params:
+    - name: url
+      value: $(params.git-url)
+    - name: revision
+      value: $(params.git-revision)
+    - name: depth
+      value: "1"
+
+  - name: build-and-push
+    taskRef:
+      name: kaniko
+      kind: ClusterTask
+    runAfter:
+    - fetch-repository
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    - name: dockerconfig
+      workspace: docker-credentials
+    params:
+    - name: IMAGE
+      value: $(params.image-name):$(params.image-tag)
+    - name: CONTEXT
+      value: $(workspaces.source.path)
+    - name: DOCKERFILE
+      value: ./Dockerfile 
