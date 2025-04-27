@@ -1,35 +1,83 @@
-version: '3'
+version: '3.8'
+
 services:
   db:
-    image: postgres:14.2-alpine
-    container_name: demo-postgres-14.2
+    image: postgres:14-alpine
+    container_name: blog-postgres
+    restart: unless-stopped
     volumes:
       - postgres_data:/var/lib/postgresql/data
     command: 
       "postgres -c 'max_connections=500'"
     environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB:-blog_production}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-blog_production}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
       - "5432:5432"
-  demo-web:
-    build: .
-    command: "./bin/rails server"
+    networks:
+      - blog-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: blog-redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - blog-network
+
+  web:
+    build:
+      context: .
+      args:
+        - RAILS_ENV=${RAILS_ENV:-production}
+    image: blog-app
+    container_name: blog-web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      - RAILS_ENV=${RAILS_ENV}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - RAILS_ENV=${RAILS_ENV:-production}
+      - POSTGRES_HOST=${POSTGRES_HOST:-db}
+      - POSTGRES_DB=${POSTGRES_DB:-blog_production}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/1}
       - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
+      - RAILS_LOG_TO_STDOUT=true
+      - RAILS_SERVE_STATIC_FILES=true
     volumes:
       - app-storage:/rails/storage
-    depends_on:
-      - db
     ports:
       - "3000:3000"
+    networks:
+      - blog-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+networks:
+  blog-network:
+    driver: bridge
 
 volumes:
-  postgres_data: {}
-  app-storage: {}
+  postgres_data:
+  redis_data:
+  app-storage:
