@@ -1,0 +1,124 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rails-config
+  labels:
+    app: rails
+data:
+  RAILS_ENV: production
+  POSTGRES_HOST: postgres
+  POSTGRES_DB: blog_production
+  POSTGRES_USER: postgres
+  REDIS_URL: redis://redis:6379/1
+  RAILS_LOG_TO_STDOUT: "true"
+  RAILS_SERVE_STATIC_FILES: "true"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: rails-secrets
+type: Opaque
+data:
+  POSTGRES_PASSWORD: cG9zdGdyZXM= # postgres (base64 encoded)
+  RAILS_MASTER_KEY: Y2hhbmdlbWU= # changeme (base64 encoded)
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rails
+  labels:
+    app: rails
+spec:
+  ports:
+    - port: 3000
+      targetPort: 3000
+      name: http
+  selector:
+    app: rails
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rails
+spec:
+  selector:
+    matchLabels:
+      app: rails
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: rails
+    spec:
+      containers:
+        - name: rails
+          image: blog-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: RAILS_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: rails-config
+                  key: RAILS_ENV
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: rails-config
+                  key: POSTGRES_HOST
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: rails-config
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: rails-config
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rails-secrets
+                  key: POSTGRES_PASSWORD
+            - name: RAILS_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: rails-secrets
+                  key: RAILS_MASTER_KEY
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: rails-config
+                  key: REDIS_URL
+            - name: RAILS_LOG_TO_STDOUT
+              valueFrom:
+                configMapKeyRef:
+                  name: rails-config
+                  key: RAILS_LOG_TO_STDOUT
+            - name: RAILS_SERVE_STATIC_FILES
+              valueFrom:
+                configMapKeyRef:
+                  name: rails-config
+                  key: RAILS_SERVE_STATIC_FILES
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 3
