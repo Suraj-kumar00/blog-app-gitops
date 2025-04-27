@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
   <head>
     <title>Blog Posts</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -15,7 +15,9 @@
     <%= javascript_importmap_tags %>
     
     <script>
+      // Setup Tailwind with dark mode support
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
             colors: {
@@ -25,22 +27,54 @@
           }
         }
       }
+
+      // Dark mode toggle functionality
+      document.addEventListener('DOMContentLoaded', function() {
+        // Check for saved theme preference or use browser preference
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+          document.getElementById('darkModeIcon').classList.add('fa-sun');
+          document.getElementById('darkModeIcon').classList.remove('fa-moon');
+        } else {
+          document.documentElement.classList.remove('dark');
+          document.getElementById('darkModeIcon').classList.add('fa-moon');
+          document.getElementById('darkModeIcon').classList.remove('fa-sun');
+        }
+
+        // Add toggle event listener
+        document.getElementById('darkModeToggle').addEventListener('click', function() {
+          if (document.documentElement.classList.contains('dark')) {
+            document.documentElement.classList.remove('dark');
+            localStorage.theme = 'light';
+            document.getElementById('darkModeIcon').classList.add('fa-moon');
+            document.getElementById('darkModeIcon').classList.remove('fa-sun');
+          } else {
+            document.documentElement.classList.add('dark');
+            localStorage.theme = 'dark';
+            document.getElementById('darkModeIcon').classList.add('fa-sun');
+            document.getElementById('darkModeIcon').classList.remove('fa-moon');
+          }
+        });
+      });
     </script>
   </head>
 
-  <body class="bg-gray-50 min-h-screen">
-    <header class="bg-white shadow-sm">
+  <body class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col h-full">
+    <header class="bg-white dark:bg-gray-800 shadow-sm">
       <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
-        <a href="<%= posts_path %>" class="text-2xl font-bold text-primary hover:text-blue-700 transition">BlogPosts</a>
-        <nav>
-          <%= link_to "New Post", new_post_path, class: "bg-primary hover:bg-blue-700 text-white py-2 px-4 rounded font-medium transition" %>
+        <a href="<%= posts_path %>" class="text-2xl font-bold text-primary hover:text-blue-700 transition dark:text-blue-400 dark:hover:text-blue-300">BlogPosts</a>
+        <nav class="flex items-center space-x-4">
+          <button id="darkModeToggle" class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 focus:outline-none">
+            <i id="darkModeIcon" class="fas fa-moon"></i>
+          </button>
+          <%= link_to "New Post", new_post_path, class: "bg-primary hover:bg-blue-700 text-white py-2 px-4 rounded font-medium transition dark:bg-blue-600 dark:hover:bg-blue-500" %>
         </nav>
       </div>
     </header>
     
-    <main class="max-w-5xl mx-auto px-4 py-8">
+    <main class="max-w-5xl mx-auto px-4 py-8 flex-grow w-full">
       <% if notice %>
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 flex items-center" role="alert">
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 flex items-center dark:bg-green-900 dark:border-green-700 dark:text-green-300" role="alert">
           <i class="fas fa-check-circle mr-2"></i>
           <span><%= notice %></span>
         </div>
@@ -49,8 +83,8 @@
       <%= yield %>
     </main>
     
-    <footer class="bg-white border-t mt-auto">
-      <div class="max-w-5xl mx-auto px-4 py-6 text-center text-gray-500">
+    <footer class="bg-white dark:bg-gray-800 border-t dark:border-gray-700 mt-auto">
+      <div class="max-w-5xl mx-auto px-4 py-4 text-center text-gray-500 dark:text-gray-400">
         <p>© <%= Date.today.year %> BlogPosts - A simple Rails app</p>
       </div>
     </footer>

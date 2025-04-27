@@ -1,14 +1,14 @@
 <p style="color: green"><%= notice %></p>
 
-<h1 class="text-3xl font-bold mb-8 text-gray-800">Blog Posts</h1>
+<h1 class="text-3xl font-bold mb-8 text-gray-800 dark:text-gray-200">Blog Posts</h1>
 
 <div id="posts" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
   <% @posts.each do |post| %>
-    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
       <div class="p-6">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2 truncate"><%= post.title %></h2>
-        <p class="text-gray-600 mb-4 line-clamp-3"><%= post.body %></p>
-        <%= link_to post, class: "text-primary hover:text-blue-700 font-medium flex items-center transition" do %>
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2 truncate"><%= post.title %></h2>
+        <p class="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3"><%= post.body %></p>
+        <%= link_to post, class: "text-primary hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium flex items-center transition" do %>
           <span>Read more</span>
           <i class="fas fa-arrow-right ml-2 text-sm"></i>
         <% end %>
@@ -18,10 +18,10 @@
 </div>
 
 <% if @posts.empty? %>
-  <div class="bg-blue-50 rounded-lg p-8 text-center">
+  <div class="bg-blue-50 dark:bg-gray-800 dark:border dark:border-blue-800 rounded-lg p-8 text-center">
     <i class="fas fa-file-alt text-4xl text-blue-400 mb-4"></i>
-    <h3 class="text-xl font-medium text-gray-700 mb-2">No posts yet</h3>
-    <p class="text-gray-600 mb-4">Get started by creating your first post!</p>
-    <%= link_to "Create Post", new_post_path, class: "inline-block bg-primary hover:bg-blue-700 text-white py-2 px-4 rounded font-medium transition" %>
+    <h3 class="text-xl font-medium text-gray-700 dark:text-gray-300 mb-2">No posts yet</h3>
+    <p class="text-gray-600 dark:text-gray-400 mb-4">Get started by creating your first post!</p>
+    <%= link_to "Create Post", new_post_path, class: "inline-block bg-primary hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white py-2 px-4 rounded font-medium transition" %>
   </div>
 <% end %>
