@@ -26,21 +26,58 @@ To run this application locally, you'll need:
 - Node.js and Yarn
 - Redis (optional for caching)
 
+## Architecture diagram
+
+![architecure diagram](public/blog-app-gitops-architecture.png)
+
+## DevOps practices
+
+- **Containerization**:
+
+  - Dockerize Ruby on Rails app and PostgreSQL DB in separate containers.
+
+- **Orchestration**:
+
+  - Deploy containers on Kubernetes cluster (Minikube/K3d).
+  - Use StatefulSet for PostgreSQL.
+  - Set up Ingress Controller or Service Mesh for routing.
+
+- **GitOps**:
+
+  - Manage Kubernetes deployments using ArgoCD.
+  - Sync deployments from a **private GitHub repository**.
+  - Store all YAMLs and ArgoCD configs in GitHub.
+
+- **CI/CD Pipeline**:
+
+  - Set up Tekton Pipelines for:
+    - Cloning source code from a **public repository**.
+    - Building Docker images.
+    - Pushing images to Docker Hub.
+  - Manual pipeline execution via Tekton Dashboard.
+
+- **Developer Workflow**:
+  - Developer pushes code to **private GitHub repo**.
+  - ArgoCD auto-deploys the updated application to Kubernetes.
+
 ## Local Setup
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/yourusername/blog-posts.git
    cd blog-posts
    ```
 
 2. Install dependencies:
+
    ```bash
    bundle install
    yarn install
    ```
 
 3. Setup the database:
+
    ```bash
    bundle exec rails db:create
    bundle exec rails db:migrate
@@ -48,6 +85,7 @@ To run this application locally, you'll need:
    ```
 
 4. Start the server:
+
    ```bash
    bundle exec rails server
    ```
@@ -73,7 +111,7 @@ To run the application with Docker, please refer to [DOCKER.md](DOCKER.md) for d
 
 ## Running Tests
 
-```bash 
+```bash
 bundle exec rspec
 ```
 

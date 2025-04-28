@@ -10,18 +10,21 @@ This guide explains how to build, run, and deploy the BlogPosts application usin
 ## Quick Start
 
 1. Clone the repository:
+
    ```bash
-   git clone https://github.com/yourusername/blog-posts.git
+   git clone https://github.com/Suraj-kumar00/blog-posts.git
    cd blog-posts
    ```
 
 2. Create a `.env` file with the necessary environment variables:
+
    ```bash
    cp .env.example .env  # If .env.example exists
    # Edit .env with your preferred text editor
    ```
 
 3. Build and start the application:
+
    ```bash
    docker-compose up -d
    ```
@@ -61,11 +64,13 @@ docker build -t blog-app .
 ### Using Docker Compose (Recommended)
 
 Start all services:
+
 ```bash
 docker-compose up -d
 ```
 
 Stop all services:
+
 ```bash
 docker-compose down
 ```
@@ -73,6 +78,7 @@ docker-compose down
 ### Running Container Commands
 
 Execute Rails commands:
+
 ```bash
 docker-compose exec web rails db:migrate
 docker-compose exec web rails console
@@ -101,7 +107,8 @@ The `docker-compose.yml` file defines:
 
 Our `Dockerfile` uses a multi-stage build approach:
 
-1. **Builder stage**: 
+1. **Builder stage**:
+
    - Installs build dependencies
    - Installs application gems
    - Precompiles assets
@@ -116,15 +123,18 @@ Our `Dockerfile` uses a multi-stage build approach:
 For production deployments:
 
 1. **Security**:
+
    - Use strong, unique passwords for database credentials
    - Store sensitive information in environment variables
    - Never commit `.env` files to version control
 
 2. **SSL/TLS**:
+
    - Add a reverse proxy like Nginx for SSL termination
    - Configure appropriate security headers
 
 3. **Scaling**:
+
    - Consider using Docker Swarm or Kubernetes for orchestration
    - Implement load balancing for high availability
 
@@ -137,12 +147,14 @@ For production deployments:
 ### Common Issues
 
 1. **Database connection issues**:
+
    ```bash
    docker-compose logs db    # Check database logs
    docker-compose exec db psql -U postgres  # Connect to the database
    ```
 
 2. **Web server not starting**:
+
    ```bash
    docker-compose logs web   # Check web server logs
    ```
@@ -157,4 +169,4 @@ For production deployments:
 
 - Use Docker volume caching for faster builds
 - Configure appropriate memory limits in `docker-compose.yml`
-- Use multi-stage builds to reduce image size 
+- Use multi-stage builds to reduce image size
