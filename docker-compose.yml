@@ -40,6 +40,9 @@ services:
   web:
     build:
       context: .
+      platforms:
+        - linux/amd64
+        - linux/arm64
       args:
         - RAILS_ENV=${RAILS_ENV:-production}
     image: blog-app

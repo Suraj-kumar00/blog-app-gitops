@@ -3,7 +3,7 @@
 # =========================
 
 ARG RUBY_VERSION=3.2.0
-FROM ruby:${RUBY_VERSION}-slim as builder
+FROM ruby:${RUBY_VERSION}-slim AS builder
 
 # Set Rails environment
 ARG RAILS_ENV=production
@@ -52,7 +52,7 @@ RUN SECRET_KEY_BASE=DUMMY bundle exec rails assets:precompile && \
 # =========================
 # Stage 2: Final Image
 # =========================
-FROM ruby:${RUBY_VERSION}-slim as app
+FROM ruby:${RUBY_VERSION}-slim AS app
 
 # Set Rails environment
 ARG RAILS_ENV=production
