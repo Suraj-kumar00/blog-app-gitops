@@ -35,6 +35,7 @@ WORKDIR /rails
 
 # Install gems
 COPY Gemfile Gemfile.lock ./
+
 RUN bundle install --jobs 4 --retry 3 && \
     bundle clean --force && \
     rm -rf /usr/local/bundle/cache/*.gem
